@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -107,8 +108,7 @@ func cursorToOffset(cursor ConnectionCursor) (int, error) {
 func CursorForObjectInConnection(data []interface{}, object interface{}) ConnectionCursor {
 	offset := -1
 	for i, d := range data {
-		// TODO: better object comparison
-		if d == object {
+		if reflect.DeepEqual(d, object) {
 			offset = i
 			break
 		}

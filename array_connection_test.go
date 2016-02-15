@@ -7,9 +7,23 @@ import (
 	"testing"
 )
 
+type CursorStruct struct {
+	ID    string `json:"id"`
+	Value string `json:"value"`
+}
+
 var arrayConnectionTestLetters = []interface{}{
 	"A", "B", "C", "D", "E",
 }
+
+var arrayConnectionTestStructs = []interface{}{
+	&CursorStruct{ID: "0", Value: "0"},
+	&CursorStruct{ID: "1", Value: "1"},
+	&CursorStruct{ID: "2", Value: "2"},
+	&CursorStruct{ID: "3", Value: "3"},
+	&CursorStruct{ID: "4", Value: "4"},
+}
+var structInstance = arrayConnectionTestStructs[1]
 
 func TestConnectionFromArray_HandlesBasicSlicing_ReturnsAllElementsWithoutFilters(t *testing.T) {
 	args := relay.NewConnectionArguments(nil)
@@ -689,6 +703,13 @@ func TestConnectionFromArray_CursorForObjectInConnection_ReturnsAnEdgeCursor_Giv
 	expected := relay.ConnectionCursor("YXJyYXljb25uZWN0aW9uOjE=")
 	if !reflect.DeepEqual(letterBCursor, expected) {
 		t.Fatalf("wrong result, cursor result diff: %v", testutil.Diff(expected, letterBCursor))
+	}
+}
+func TestConnectionFromArray_CursorForObjectInConnection_ReturnsAnEdgeCursor_GivenAnArrayAndAMemberObjectStruct(t *testing.T) {
+	structCursor := relay.CursorForObjectInConnection(arrayConnectionTestStructs, structInstance)
+	expected := relay.ConnectionCursor("YXJyYXljb25uZWN0aW9uOjE=") // should be the element at index 1
+	if !reflect.DeepEqual(structCursor, expected) {
+		t.Fatalf("wrong result, cursor result diff: %v", testutil.Diff(expected, structCursor))
 	}
 }
 func TestConnectionFromArray_CursorForObjectInConnection_ReturnsEmptyCursor_GivenAnArrayAndANonMemberObject(t *testing.T) {
